@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3. Работа в группе</title>
+<style>
+  body { font-family: sans-serif; background: #fef2f2; padding: 16px; max-width: 600px; margin: auto; color: #7f1d1d; }
+  h1 { font-size: 20px; text-align: center; }
+  .block { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .block h2 { font-size: 16px; margin-bottom: 12px; }
+  .q { margin-bottom: 16px; border-bottom: 1px dashed #fecaca; padding-bottom: 12px; }
+  .q p { font-weight: 500; margin-bottom: 8px; }
+  label { display: block; padding: 10px; margin: 4px 0; background: #f8fafc; border-radius: 8px; border: 2px solid transparent; cursor: pointer; }
+  label:has(input:checked) { background: #fee2e2; border-color: #ef4444; }
+  input[type="radio"] { margin-right: 8px; transform: scale(1.2); }
+  input[type="text"], select { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #fecaca; border-radius: 8px; box-sizing: border-box; }
+  select { margin-bottom: 10px; background-color: white; }
+  button { background: #dc2626; color: white; border: none; padding: 16px; width: 100%; font-size: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 20px; }
+  button:disabled { background: #94a3b8; }
+  .success { display: none; text-align: center; padding: 20px; background: #fee2e2; border-radius: 12px; font-weight: bold; margin-top: 20px; }
+</style>
+</head>
+<body>
+<h1>3️⃣ Работа в группе</h1>
+<div id="quiz-container">
+  <div class="block">
+    <h2>Ваш класс и номер группы</h2>
+    <select id="student-class">
+      <option value="6А">6 «А» класс</option>
+      <option value="6Б">6 «Б» класс</option>
+      <option value="6В">6 «В» класс</option>
+    </select>
+    <input type="text" id="student-name" placeholder="Группа №1" required>
+  </div>
+
+  <div class="block">
+    <div class="q"><p>1. В городе 11 одинаковых контейнеров для раздельного сбора, 7 из них заполнены. Запишите долю заполненных контейнеров 7/11 в виде бесконечной периодической дроби.</p>
+      <label><input type="radio" name="grp1" value="3"> 0,(63)</label>
+      <label><input type="radio" name="grp1" value="0"> 0,(36)</label>
+      <label><input type="radio" name="grp1" value="0"> 0,(7)</label>
+      <label><input type="radio" name="grp1" value="0"> 0,63</label>
+    </div>
+    <div class="q"><p>2. Высота молодой ели равна 1,(3) м. Запишите это число обыкновенной дробью.</p>
+      <label><input type="radio" name="grp2" value="0"> 13/10</label>
+      <label><input type="radio" name="grp2" value="3"> 4/3</label>
+      <label><input type="radio" name="grp2" value="0"> 10/9</label>
+      <label><input type="radio" name="grp2" value="0"> 13/9</label>
+    </div>
+    <div class="q"><p>3. Датчик выдаёт повторяющуюся группу цифр: 0,(142857). Какая цифра стоит на 100-м месте после запятой?</p>
+      <label><input type="radio" name="grp3" value="0"> 1</label>
+      <label><input type="radio" name="grp3" value="0"> 4</label>
+      <label><input type="radio" name="grp3" value="0"> 2</label>
+      <label><input type="radio" name="grp3" value="3"> 8</label>
+    </div>
+  </div>
+  <button id="submit-btn" onclick="submitResults()">✅ Отправить</button>
+</div>
+<div class="success" id="success-msg"><h2>Успешно!</h2><p>Урок завершен, спасибо!</p></div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUOKxRl8uusoCGXETycx0lsK4oMdwVc6yKVYd4OaDMZ66D6p3P0QloY06sAxAFUKvVhA/exec';
+function submitResults() {
+  const className = document.getElementById('student-class').value;
+  const name = document.getElementById('student-name').value.trim();
+  if (!name) return alert('Введите номер группы!');
+  
+  let score = 0;
+  for(let i=1; i<=3; i++) {
+    const ans = document.querySelector(`input[name="grp${i}"]:checked`);
+    if (!ans) return alert('Ответьте на все вопросы!');
+    if (ans.value === '3') score += 3;
+  }
+  
+  const btn = document.getElementById('submit-btn'); btn.disabled = true; btn.innerText = 'Отправка...';
+  const data = { name: className + ' | ' + name, indScore: 0, pairScore: 0, grpScore: score };
+  
+  fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })
+  .then(() => { document.getElementById('quiz-container').style.display = 'none'; document.getElementById('success-msg').style.display = 'block'; })
+  .catch(() => alert('Ошибка. Проверьте интернет.'));
+}
+</script>
+</body>
+</html>
